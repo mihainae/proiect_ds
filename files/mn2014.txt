@@ -1,0 +1,36 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265
+{\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww33100\viewh19300\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs28 \cf0 1. Introducere. Reprezentarea \'een virgul\uc0\u259  mobil\u259  (standardul IEEE 754 pentru numere reale). Analiza erorilor. Condi\u355 ionarea problemelor \u351 i stabilitatea numeric\u259  a algoritmilor. Complexitatea algoritmilor numerici.\
+2. Preliminarii matematice: invers\uc0\u259 ri \u537 i factoriz\u259 ri. Forme matriciale: matrici superior/inferior triungiulare, matrici diagonale, matrici tridiagonale, matrici Hessenberg, matrici pozitiv/semi-pozitiv definite. Norme vectoriale \u537 i norme matriciale. Num\u259 r de condi\u539 ionare. Matrici r\u259 u condi\u539 ionate.\
+3. Rezolvarea sistemelor de ecua\uc0\u355 ii liniare prin metode directe. Eliminare gaussiana. Stategii de pivotare. Factoriz\u259 ri LU.\
+4. Metode iterative de rezolvare a sistemelor de ecua\uc0\u355 ii liniare: Jacobi, Gauss-Siedel, Suprarelaxare. Analiza convergen\u539 ei metodelor iterative. Propagarea erorilor \'een rezolvarea sistemelor de ecua\u355 ii liniare.\
+5. Transform\uc0\u259 ri ortogonale: Householder, Givens (trasform\u259 ri de rota\u539 ii), Gram-Schmidt. Rezolvarea sistemelor de ecua\u355 ii liniare prin transform\u259 ri ortogonale. Analiza stabilit\u259 \u539 ii numerice.\
+6. Rezolvarea ecua\uc0\u539 iilor neliniare. Solu\u539 ii pentru sisteme neliniare de ecua\u539 ii. Metode newtoniene \u537 i cvasi-newtoniene.\
+7. Valori proprii \uc0\u351 i vectori proprii: metode aproximative. Metoda puterii. Tehnici de defla\u539 ie. Transformarea Hauseholder.\
+8. Algoritmul QR. Forma cu deplasare explicit\uc0\u259  cu pa\u351 i simpli/dubli. Forma cu deplasare implicit\u259 . Descompunerea valorilor singulare.\
+9. Interpolare \uc0\u537 i aproximare polinomial\u259 . Polinomul de interpolare Lagrange. Diferen\u355 e divizate. Polinomul Newton. Eroarea interpol\u259 rii. Interpolare cu func\u355 ii spline. Curbe parametrizate (Hermite, Bezier, B-Spline).\
+10. Teoria aproxim\uc0\u259 rii: aproximare continu\u259  \u351 i discret\u259  \'een sensul celor mai mici p\u259 trate. Polinoame Ceb\'e2\u537 ev. Aproximare polinomial\u259  trigonometric\u259 . Transform\u259 ri Fourier rapide.\
+11. Integrare numeric\uc0\u259 . Cuadraturi de baz\u259 . Metode Newton-Cotes \u537 i Simpson. Eroarea integr\u259 rii numerice. Metoda Romberg.\
+12. Integrare numeric\uc0\u259 . Cuadraturi Gaussiene. Polinoame ortogonale. Derivare Numeric\u259 .\
+13. Solu\uc0\u539 ii numerice pentru integrarea ecua\u355 iilor diferen\u355 iale ordinare cu condi\u539 ii ini\u539 iale. Metode Runge-Kutta. Tehnici adaptive: metode multipas explicite \u351 i implicite. \
+14. Metode predictor-corector pentru integrarea ecua\uc0\u355 iilor diferen\u355 iale. Convergen\u355 a metodelor multipas. Metode de rezolvare a sistemelor de ecua\u539 ii diferen\u539 iale.\
+\
+\
+1. Introducere \'een Matlab/Octave. Func\uc0\u539 ii Octave. Fi\u351 iere M. Func\u539 ii de citire/scriere de tipul C.\
+2. Opera\uc0\u355 ii cu matrici \'een Matlab. Rezolvarea recursiv\u259  a sistemelor triunghiulare. Inversarea matricelor prin parti\u355 ionare \u351 i Gauss-Jordan.\
+3. Eliminare gaussian\uc0\u259  cu pivotare total\u259  \u537 i scalare. Algoritmul Thomas pentru rezolvarea sistemului 3-diagonal. \
+4. Metode iterative pentru rezolvarea sistemelor: Jacobi, Gauss-Siedel, Suprarelaxare.\
+5. Rezolvarea sistemelor de ecua\uc0\u355 ii liniare prin transform\u259 ri ortogonale: Householder, Givens, Gram-Schmidt.\
+6. Solu\uc0\u355 ia ecua\u355 iei neliniare f(x)=0. R\u259 d\u259 cinile polinoamelor. Lucrul cu polinoame \'een Matlab. Metoda Newton \u537 i cvasi-Newton pentru sistemele neliniare.\
+7. Calculul valorilor proprii \uc0\u351 i vectorilor proprii prin metodele puterii. \
+8. Algoritmul QR cu deplasare explicit\uc0\u259  pentru matrice simetrice.\
+9. Metode de interpolare de cu func\uc0\u539 ii spline cubice. Curbe Bezier. Algoritmul de-Casteljau.\
+10. Transform\uc0\u259 ri Fourier rapide. Algoritmii lui Remez pentru aproximare minimax (?).\
+11. Metodele Newton-Cotes \uc0\u537 i Simpson. Metoda Romberg.\
+12. Cuadraturi Gaussiene. Polinoame ortogonale.\
+13. Metode Runge-Kutta.\
+14. Metode predictor-corector pentru integrarea ecua\uc0\u355 iilor diferen\u355 iale.}
