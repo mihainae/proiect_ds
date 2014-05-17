@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
 import file.FileDescription;
+import server.ServerData;
 
 public class Client extends AbstractClient {
 
@@ -30,6 +31,12 @@ public class Client extends AbstractClient {
         this.clientPort = clientPort;
         this.serverIp = serverIp;
         this.serverPort = serverPort;
+
+        messages = new ArrayList<String>();
+        peersLock = new ReentrantLock();
+        new ReentrantLock();
+        sendLock = new ReentrantLock();
+        peers = new ArrayList<ObjectOutputStream>();
 
         files = new Hashtable<String, ArrayList<byte[]>>();
 
@@ -100,6 +107,40 @@ public class Client extends AbstractClient {
     @Override
     public File retrieveFile(String filename) throws IOException {
 
+        FileDescription fileDescription = new FileDescription(filename, 1);
+        outToCentral.writeObject(fileDescription);
+
+        ServerData message = null;
+        try {
+            message = (ServerData) inFromCentral.readObject();
+            System.out.println("Received message: " + message.getFileDescription().getFileName());
+
+            ArrayList<String> peerIPs = message.getPeerIPs();
+            ArrayList<Integer> peerPorts = message.getPeerPorts();
+
+            for(int i = 0; i < peerIPs.size(); i++) {
+                String peerIp = peerIPs.get(i);
+                Integer peerPort = peerPorts.get(i);
+                System.out.println(peerIp + " " + peerPort);
+            }
+
+            Socket peerSocket = new Socket(peerIPs.get(0), peerPorts.get(0));
+            ObjectOutputStream outToPeer = new ObjectOutputStream(peerSocket.getOutputStream());
+            ObjectInputStream inFromPeer = new ObjectInputStream(peerSocket.getInputStream());
+
+            outToPeer.writeObject("get file: " + filename);
+            String response = null;
+            try {
+                response = (String) inFromPeer.readObject();
+                System.out.println("Received response: " + response);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        /*
         ArrayList<byte []> chunks = files.get(filename);
         File newFile = new File(filename);
         FileOutputStream fos = new FileOutputStream(newFile);
@@ -109,7 +150,7 @@ public class Client extends AbstractClient {
             fos.flush();
         }
         fos.close();
-
+        */
         return null;
     }
 
@@ -127,7 +168,7 @@ public class Client extends AbstractClient {
             try {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
-                out.writeObject(String.valueOf(serverSocket.getLocalPort()));
+                //out.writeObject(String.valueOf(serverSocket.getLocalPort()));
 
                 peersLock.lock();
                 try {

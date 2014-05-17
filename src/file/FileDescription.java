@@ -10,6 +10,7 @@ public class FileDescription implements Serializable {
     public int sequenceLength;
     public String clientIp;
     public int clientPort;
+    public int type;
 
     public FileDescription(String fileName, long fileSize,
                            int chunkSize, int sequenceLength, String clientIp, int clientPort) {
@@ -19,6 +20,12 @@ public class FileDescription implements Serializable {
         this.sequenceLength = sequenceLength;
         this.clientIp = clientIp;
         this.clientPort = clientPort;
+        this.type = 0;
+    }
+
+    public FileDescription(String fileName, int type) {
+        this.fileName = fileName;
+        this.type = 1;
     }
 
     public void setFileName(String fileName) {
@@ -67,5 +74,13 @@ public class FileDescription implements Serializable {
 
     public int getClientPort() {
         return clientPort;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getType() {
+        return type;
     }
 }

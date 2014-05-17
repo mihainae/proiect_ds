@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
 
 import file.FileDescription;
@@ -19,6 +20,7 @@ public class Server {
     private ReentrantLock sendLock;
     public String serverIp;
     public int serverPort;
+    public Hashtable<String, ServerData> resources;
 
     public Server(String serverIp, int serverPort /*, ArrayList<Integer> peerPorts*/) throws IOException {
         this.serverIp = serverIp;
@@ -30,6 +32,8 @@ public class Server {
         new ReentrantLock();
         sendLock = new ReentrantLock();
         peers = new ArrayList<ObjectOutputStream>();
+
+        resources = new Hashtable<String, ServerData>();
 
         /*
         for(int i = 0; i < peerPorts.size(); i++) {
@@ -66,7 +70,7 @@ public class Server {
             try {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
-                out.writeObject(String.valueOf(serverSocket.getLocalPort()));
+                //out.writeObject(String.valueOf(serverSocket.getLocalPort()));
 
                 peersLock.lock();
                 try {
@@ -84,8 +88,29 @@ public class Server {
                     FileDescription message = (FileDescription) in.readObject();
                     sendLock.lock();
                     //messages.add(message);
-                    System.out.println("Received message: " + message.getFileName() + " " + message.getClientPort());
-                    out.writeObject("ACK");
+                    System.out.println("Received message: " + message.getFileName() + " " + message.getClientPort() + " " + message.getType());
+                    if(message.getType() == 0) { //publish a file
+                        if(resources.get(message.getFileName()) == null) {
+                            ServerData serverData = new ServerData(message, message.getClientIp(), message.getClientPort());
+                            resources.put(message.getFileName(), serverData);
+                        }
+                        else {
+                            ServerData serverData = resources.get(message.getFileName());
+                            serverData.addPeerIp(message.getClientIp());
+                            serverData.addPeerPort(message.getClientPort());
+                        }
+                        out.writeObject("ACK");
+                    }
+                    else {
+                        if(message.getType() == 1) { //query for a file
+                            String fileName = message.getFileName();
+                            System.out.println("Filename: " + fileName);
+                            if(resources.get(fileName) != null) {
+                                out.writeObject(resources.get(fileName));
+                            }
+                        }
+                    }
+
 
                     sendLock.unlock();
                 }
