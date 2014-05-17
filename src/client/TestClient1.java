@@ -33,8 +33,7 @@ public class TestClient1 {
 				File curentFile=new File(file);
 	            cli.publishFile(curentFile);
 	            System.out.println("[TestClient1]: File "+file+" was published... DONE!");
-                cli.retrieveFile(curentFile.getName());
-                break;
+                //cli.retrieveFile(curentFile.getName());
 			}
 
 		} catch(Exception e) {

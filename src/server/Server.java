@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import file.FileDescription;
+
 public class Server {
 
     public ServerSocket serverSocket;
@@ -79,10 +81,10 @@ public class Server {
 
                 while (true) {
 
-                    String message = (String) in.readObject();
+                    FileDescription message = (FileDescription) in.readObject();
                     sendLock.lock();
-                    messages.add(message);
-                    System.out.println("Received message: " + message);
+                    //messages.add(message);
+                    System.out.println("Received message: " + message.getFileName() + " " + message.getClientPort());
                     out.writeObject("ACK");
 
                     sendLock.unlock();

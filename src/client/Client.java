@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
+import file.FileDescription;
 
 public class Client extends AbstractClient {
 
@@ -76,9 +77,10 @@ public class Client extends AbstractClient {
 
         files.put(fileName, chunks);
 
-        /*
-        outToCentral.writeObject(file.getName());
-        outToCentral.writeObject(file.length());
+        FileDescription fileDescription = new FileDescription(file.getName(), file.length(),
+                sizeOfFiles, chunks.size(), clientIp, clientPort);
+        outToCentral.writeObject(fileDescription);
+
         // Wait a bit before sending the next message.
         try {
             Thread.sleep(100);
@@ -92,7 +94,7 @@ public class Client extends AbstractClient {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        */
+
     }
 
     @Override
