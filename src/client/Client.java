@@ -120,40 +120,28 @@ public class Client extends AbstractClient {
             Hashtable<Integer, ArrayList<String>> peerIPs = message.getPeerIPs();
             Hashtable<Integer, ArrayList<Integer>> peerPorts = message.getPeerPorts();
 
-            /*
-            for(int i = 0; i < peerIPs.size(); i++) {
-                String peerIp = peerIPs.get(i);
-                Integer peerPort = peerPorts.get(i);
-                System.out.println(peerIp + " " + peerPort);
-            }*/
-
-
+            ArrayList<CreateFile> threads = new ArrayList<CreateFile>();
             ArrayList<byte []> chunks = new ArrayList<byte[]>();
 
             for(int i = 0; i < message.getFileDescription().getSequenceLength(); i++) {
 
-                Socket peerSocket = new Socket(peerIPs.get(i).get(0), peerPorts.get(i).get(0));
-                ObjectOutputStream outToPeer = new ObjectOutputStream(peerSocket.getOutputStream());
-                ObjectInputStream inFromPeer = new ObjectInputStream(peerSocket.getInputStream());
+                CreateFile createFile = new CreateFile(i, filename, peerIPs, peerPorts);
+                threads.add(createFile);
 
-                FileChunk fileChunk = new FileChunk(filename, i, 1);
-                outToPeer.writeObject(fileChunk);
+            }
 
-                FileChunk response = null;
+            for(CreateFile cf: threads) {
                 try {
-                    response = (FileChunk) inFromPeer.readObject();
-                    System.out.println("Received response: " + response.sequenceNumber);
-                    chunks.add(response.getChunk());
-
-                    FileDescription recordFile = new FileDescription(filename, 2, i, clientIp, clientPort);
-                    outToCentral.writeObject(recordFile);
-
-                } catch (ClassNotFoundException e) {
+                    cf.join();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                outToPeer.close();
-                inFromPeer.close();
-                peerSocket.close();
+            }
+
+            System.out.println("Am terminat");
+
+            for(CreateFile cf: threads) {
+                chunks.add(cf.getChunk());
             }
 
             File newFile = new File(filename);
@@ -165,22 +153,10 @@ public class Client extends AbstractClient {
             }
             fos.close();
 
-
-
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        /*
-        ArrayList<byte []> chunks = files.get(filename);
-        File newFile = new File(filename);
-        FileOutputStream fos = new FileOutputStream(newFile);
-        newFile.createNewFile();
-        for(byte [] ch: chunks) {
-            fos.write(ch);
-            fos.flush();
-        }
-        fos.close();
-        */
+
         return null;
     }
 
@@ -198,8 +174,6 @@ public class Client extends AbstractClient {
             try {
                 out = new ObjectOutputStream(socket.getOutputStream());
 
-                //out.writeObject(String.valueOf(serverSocket.getLocalPort()));
-
                 peersLock.lock();
                 try {
                     peers.add(out);
@@ -208,8 +182,6 @@ public class Client extends AbstractClient {
                 }
 
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-
-                //int port = Integer.parseInt((String) in.readObject());
 
                 while (true) {
 
@@ -248,5 +220,58 @@ public class Client extends AbstractClient {
                 e.printStackTrace();
             }
         }
+    }
+
+    class CreateFile extends Thread {
+
+        public int sequenceNumber;
+        public String fileName;
+        public byte [] chunk;
+        public Hashtable<Integer, ArrayList<String>> peerIPs;
+        public Hashtable<Integer, ArrayList<Integer>> peerPorts;
+        public CreateFile(int sequenceNumber, String fileName,
+                          Hashtable<Integer, ArrayList<String>> peerIPs, Hashtable<Integer, ArrayList<Integer>> peerPorts) {
+            this.sequenceNumber = sequenceNumber;
+            this.peerIPs = peerIPs;
+            this.peerPorts = peerPorts;
+            this.fileName = fileName;
+            start();
+        }
+
+        public void run() {
+
+            try {
+                Socket peerSocket = new Socket(peerIPs.get(sequenceNumber).get(0), peerPorts.get(sequenceNumber).get(0));
+
+                ObjectOutputStream outToPeer = new ObjectOutputStream(peerSocket.getOutputStream());
+                ObjectInputStream inFromPeer = new ObjectInputStream(peerSocket.getInputStream());
+
+                FileChunk fileChunk = new FileChunk(fileName, sequenceNumber, 1);
+                outToPeer.writeObject(fileChunk);
+
+                FileChunk response = null;
+                try {
+                    response = (FileChunk) inFromPeer.readObject();
+                    System.out.println("Received response: " + response.sequenceNumber);
+                    chunk = response.getChunk();
+
+                    FileDescription recordFile = new FileDescription(fileName, 2, sequenceNumber, clientIp, clientPort);
+                    outToCentral.writeObject(recordFile);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                outToPeer.close();
+                inFromPeer.close();
+                peerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public byte [] getChunk() {
+            return chunk;
+        }
+
     }
 }
