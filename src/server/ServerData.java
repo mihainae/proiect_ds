@@ -9,23 +9,33 @@ import java.util.Hashtable;
 public class ServerData implements Serializable{
 
     public FileDescription fileDescription;
-    public ArrayList<String> peerIPs;
-    public ArrayList<Integer> peerPorts;
+    public Hashtable<Integer, ArrayList<String>> peerIPs;
+    public Hashtable<Integer, ArrayList<Integer>> peerPorts;
 
     public ServerData(FileDescription fileDescription, String peerIp, int peerPort) {
         this.fileDescription = fileDescription;
-        this.peerIPs = new ArrayList<String>();
-        this.peerPorts = new ArrayList<Integer>();
-        peerIPs.add(peerIp);
-        peerPorts.add(peerPort);
+        this.peerIPs = new Hashtable<Integer, ArrayList<String>>();
+        this.peerPorts = new Hashtable<Integer, ArrayList<Integer>>();
+        for(int i = 0; i < fileDescription.getSequenceLength(); i++) {
+            ArrayList<String> pIP = new ArrayList<String>();
+            ArrayList<Integer> pPort = new ArrayList<Integer>();
+            pIP.add(peerIp);
+            pPort.add(peerPort);
+            peerIPs.put(i, pIP);
+            peerPorts.put(i, pPort);
+        }
     }
 
-    public void addPeerIp(String peerIp) {
-        peerIPs.add(peerIp);
+    public void addPeerIp(String peerIp, int sequence) {
+        ArrayList<String> pIP = peerIPs.get(sequence);
+        pIP.add(peerIp);
+        peerIPs.put(sequence, pIP);
     }
 
-    public void addPeerPort(int peerPort) {
-        peerPorts.add(peerPort);
+    public void addPeerPort(int peerPort, int sequence) {
+        ArrayList<Integer> pPort = peerPorts.get(sequence);
+        pPort.add(peerPort);
+        peerPorts.put(sequence, pPort);
     }
 
     public void setFileDescription(FileDescription fileDescription) {
@@ -36,19 +46,19 @@ public class ServerData implements Serializable{
         return fileDescription;
     }
 
-    public void setPeerIPs(ArrayList<String> peerIPs) {
+    public void setPeerIPs(Hashtable<Integer, ArrayList<String>> peerIPs) {
         this.peerIPs = peerIPs;
     }
 
-    public ArrayList<String> getPeerIPs() {
+    public Hashtable<Integer, ArrayList<String>> getPeerIPs() {
         return peerIPs;
     }
 
-    public void setPeerPorts(ArrayList<Integer> peerPorts) {
+    public void setPeerPorts(Hashtable<Integer, ArrayList<Integer>> peerPorts) {
         this.peerPorts = peerPorts;
     }
 
-    public ArrayList<Integer> getPeerPorts() {
+    public Hashtable<Integer, ArrayList<Integer>> getPeerPorts() {
         return peerPorts;
     }
 }

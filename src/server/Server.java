@@ -96,8 +96,10 @@ public class Server {
                         }
                         else {
                             ServerData serverData = resources.get(message.getFileName());
-                            serverData.addPeerIp(message.getClientIp());
-                            serverData.addPeerPort(message.getClientPort());
+                            for(int i = 0; i <= message.getSequenceLength(); i++) {
+                                serverData.addPeerIp(message.getClientIp(), i);
+                                serverData.addPeerPort(message.getClientPort(), i);
+                            }
                         }
                         out.writeObject("ACK");
                     }
@@ -107,6 +109,16 @@ public class Server {
                             System.out.println("Filename: " + fileName);
                             if(resources.get(fileName) != null) {
                                 out.writeObject(resources.get(fileName));
+                            }
+                        }
+                        else {
+                            if(message.getType() == 2) { //chunk was downloaded
+                                String fileName = message.getFileName();
+                                int sequenceNumber = message.getSequenceNumber();
+                                //System.out.println("Received sequence: " + sequenceNumber);
+                                ServerData serverData = resources.get(fileName);
+                                serverData.addPeerIp(message.getClientIp(), sequenceNumber);
+                                serverData.addPeerPort(message.getClientPort(), sequenceNumber);
                             }
                         }
                     }

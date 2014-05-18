@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.locks.ReentrantLock;
+
+import file.FileChunk;
 import file.FileDescription;
 import server.ServerData;
 
@@ -115,27 +117,55 @@ public class Client extends AbstractClient {
             message = (ServerData) inFromCentral.readObject();
             System.out.println("Received message: " + message.getFileDescription().getFileName());
 
-            ArrayList<String> peerIPs = message.getPeerIPs();
-            ArrayList<Integer> peerPorts = message.getPeerPorts();
+            Hashtable<Integer, ArrayList<String>> peerIPs = message.getPeerIPs();
+            Hashtable<Integer, ArrayList<Integer>> peerPorts = message.getPeerPorts();
 
+            /*
             for(int i = 0; i < peerIPs.size(); i++) {
                 String peerIp = peerIPs.get(i);
                 Integer peerPort = peerPorts.get(i);
                 System.out.println(peerIp + " " + peerPort);
+            }*/
+
+
+            ArrayList<byte []> chunks = new ArrayList<byte[]>();
+
+            for(int i = 0; i < message.getFileDescription().getSequenceLength(); i++) {
+
+                Socket peerSocket = new Socket(peerIPs.get(i).get(0), peerPorts.get(i).get(0));
+                ObjectOutputStream outToPeer = new ObjectOutputStream(peerSocket.getOutputStream());
+                ObjectInputStream inFromPeer = new ObjectInputStream(peerSocket.getInputStream());
+
+                FileChunk fileChunk = new FileChunk(filename, i, 1);
+                outToPeer.writeObject(fileChunk);
+
+                FileChunk response = null;
+                try {
+                    response = (FileChunk) inFromPeer.readObject();
+                    System.out.println("Received response: " + response.sequenceNumber);
+                    chunks.add(response.getChunk());
+
+                    FileDescription recordFile = new FileDescription(filename, 2, i, clientIp, clientPort);
+                    outToCentral.writeObject(recordFile);
+
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                outToPeer.close();
+                inFromPeer.close();
+                peerSocket.close();
             }
 
-            Socket peerSocket = new Socket(peerIPs.get(0), peerPorts.get(0));
-            ObjectOutputStream outToPeer = new ObjectOutputStream(peerSocket.getOutputStream());
-            ObjectInputStream inFromPeer = new ObjectInputStream(peerSocket.getInputStream());
-
-            outToPeer.writeObject("get file: " + filename);
-            String response = null;
-            try {
-                response = (String) inFromPeer.readObject();
-                System.out.println("Received response: " + response);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            File newFile = new File(filename);
+            FileOutputStream fos = new FileOutputStream(newFile);
+            newFile.createNewFile();
+            for(byte [] chunk: chunks) {
+                fos.write(chunk);
+                fos.flush();
             }
+            fos.close();
+
+
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -183,12 +213,17 @@ public class Client extends AbstractClient {
 
                 while (true) {
 
-                    String message = (String) in.readObject();
+                    FileChunk message = (FileChunk) in.readObject();
                     sendLock.lock();
-                    messages.add(message);
-                    System.out.println("Received message: " + message);
-                    out.writeObject("ACK");
-
+                    //messages.add(message);
+                    System.out.println("Received message: " + message.type);
+                    if(message.type == 1) {
+                        String fileName = message.getFileName();
+                        ArrayList<byte []> chunks = files.get(fileName);
+                        byte [] chunk = chunks.get(message.getSequenceNumber());
+                        FileChunk fileChunk = new FileChunk(fileName, message.getSequenceNumber(), 2, chunk);
+                        out.writeObject(fileChunk);
+                    }
                     sendLock.unlock();
                 }
             } catch (java.net.SocketException t) {
